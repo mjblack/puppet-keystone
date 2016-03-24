@@ -77,6 +77,19 @@ class Puppet::Provider::Keystone < Puppet::Provider::Openstack
     DEFAULT_DOMAIN
   end
 
+  def self.using_domain_config?
+    using_domain_config = Puppet::Resource.indirection
+      .find('Keystone_config/identity/domain_specific_drivers_enabled')
+    if using_domain_config[:ensure] == :present
+      # get from ini file
+      using_domain_config[:value]
+    else
+      nil
+    end
+  rescue
+    nil
+  end
+
   def self.resource_to_name(domain, name, check_for_default = true)
     raise Puppet::Error, "Domain cannot be nil for project '#{name}'. " \
       'Please report a bug.' if domain.nil?

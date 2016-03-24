@@ -174,7 +174,11 @@ Puppet::Type.type(:keystone_user).provide(
       warning(default_domain_deprecation_message)
     end
     self.do_not_manage = true
-    users = request('user', 'list', ['--long'])
+    request_params = ['--long']
+    if using_domain_config?
+      request_params.push('--domain', default_domain)
+    end
+    users = request('user', 'list', request_params)
     list = users.collect do |user|
       domain_name = domain_name_from_id(user[:domain])
       new(
